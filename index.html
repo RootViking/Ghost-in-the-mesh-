@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ghost in the Mesh: Red vs. Blue</title>
+  <meta name="description" content="A pixel-art, turn-based browser game that teaches attack and defence on a simulated network.">
+  <!-- Pixel fonts. If you are offline the game falls back to a monospace font. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- Top bar -->
+  <header id="topbar">
+    <div class="logo">GHOST IN THE MESH</div>
+    <div id="phase" class="phase">TITLE</div>
+    <nav>
+      <button id="btn-codex">CODEX [C]</button>
+      <button id="btn-help">HELP [H]</button>
+      <button id="btn-music">MUSIC ON [B]</button>
+      <button id="btn-sound">SOUND ON [M]</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Left: the map and the message feed -->
+    <section id="stage">
+      <div class="canvas-wrap"><canvas id="map" width="960" height="600" aria-label="Network map"></canvas></div>
+      <div id="termbar"><span class="tb-title">TERMINAL</span><span class="tb-sub">every action is explained here</span><button id="btn-expand">EXPAND [T]</button></div>
+      <div id="feed" aria-live="polite"></div>
+    </section>
+    <!-- Right: status and action buttons (filled in by ui.js) -->
+    <aside id="panel"></aside>
+  </main>
+
+  <div id="toast" hidden></div>
+
+  <!-- Title screen -->
+  <div id="scr-title" class="screen">
+    <div class="box title-box">
+      <div class="ghost-art" aria-hidden="true"></div>
+      <h1>GHOST IN<br>THE MESH</h1>
+      <div class="vs"><span class="r">RED</span> vs. <span class="c">BLUE</span></div>
+      <p>Break into a simulated network. Then defend it against an AI that learned from you.</p>
+      <div class="diff-label">DIFFICULTY <span class="dim">[LEFT / RIGHT]</span></div>
+      <div id="diffs" class="diffs"></div>
+      <p id="diff-blurb" class="fine"></p>
+      <button id="btn-start" class="big blinky">PRESS START [ENTER]</button>
+      <div class="title-opts"><button id="btn-music2">MUSIC ON [B]</button></div>
+      <p id="title-best" class="fine"></p>
+      <p class="fine">Everything is simulated. No real hosts, no real exploits.</p>
+    </div>
+  </div>
+
+  <!-- Tutorial / help -->
+  <div id="scr-tutorial" class="screen" hidden>
+    <div class="box">
+      <div id="tut-body"></div>
+      <div class="tut-nav">
+        <button id="tut-back">BACK</button>
+        <span id="tut-count"></span>
+        <button id="tut-skip">SKIP [ESC]</button>
+        <button id="tut-next" class="big">NEXT [ENTER]</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intermission between Red and Blue -->
+  <div id="scr-brief" class="screen" hidden>
+    <div class="box">
+      <div id="brief-body"></div>
+      <button id="btn-defend" class="big">DEFEND THE NETWORK [ENTER]</button>
+    </div>
+  </div>
+
+  <!-- End screen with the after-action report -->
+  <div id="scr-end" class="screen" hidden>
+    <div class="box wide">
+      <div id="end-banner" class="banner"></div>
+      <p id="end-why"></p>
+      <div id="end-score" class="score"></div>
+      <div class="end-nav">
+        <button id="btn-again" class="big">PLAY AGAIN [R]</button>
+        <button id="btn-codex2">CODEX [C]</button>
+        <button id="btn-print">PRINT REPORT</button>
+      </div>
+      <div id="badges" class="badges"></div>
+      <div id="report"></div>
+    </div>
+  </div>
+
+  <!-- Codex -->
+  <div id="codex" class="modal" hidden>
+    <div class="box wide">
+      <div class="modal-head"><h2>CODEX</h2><span id="codex-count"></span><button id="codex-close">CLOSE [ESC]</button></div>
+      <div id="codex-list"></div>
+    </div>
+  </div>
+
+  <!-- Terminal mini-game -->
+  <div id="term" class="modal" hidden>
+    <div class="box termbox">
+      <div class="modal-head"><h2 id="term-title"></h2><button id="term-cancel">CANCEL [ESC]</button></div>
+      <p id="term-task"></p>
+      <div class="term-ref">EXAMPLE: <span id="term-parts"></span></div>
+      <div id="term-explain"></div>
+      <div class="term-screen">
+        <div id="term-out"></div>
+        <label class="term-line"><span id="term-prompt"></span>
+          <input id="term-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the command">
+        </label>
+      </div>
+      <div id="term-msg" class="term-msg"></div>
+      <div class="term-nav">
+        <button id="term-skip"></button>
+        <button id="term-ok" class="big">RUN [ENTER]</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts load in dependency order: data, then rules, then the
+     two sides, then drawing/UI, then main.js which starts it all.
+     Plain <script> tags (no modules) so index.html works when
+     opened straight from disk. -->
+<script src="js/data-network.js"></script>
+<script src="js/data-codex.js"></script>
+<script src="js/data-logs.js"></script>
+<script src="js/data-commands.js"></script>
+<script src="js/data-explain.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/rules.js"></script>
+<script src="js/state.js"></script>
+<script src="js/red.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/blue.js"></script>
+<script src="js/terminal.js"></script>
+<script src="js/map.js"></script>
+<script src="js/report.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
